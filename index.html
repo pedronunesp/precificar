@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Preços - A Sertaneja</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cor-primaria: #FF6B35; /* Laranja */
+            --cor-secundaria: #1A1A1A; /* Preto */
+            --cor-texto: #FFFFFF; /* Branco */
+            --cor-fundo: #000000; /* Preto */
+            --cor-destaque: #FF6B35; /* Laranja */
+            --cor-input-fundo: #333333; /* Fundo escuro para inputs no tema escuro */
+            --cor-input-texto: #FFFFFF; /* Texto branco para inputs no tema escuro */
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--cor-fundo);
+            color: var(--cor-texto);
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--cor-primaria);
+            font-weight: 600;
+        }
+
+        .input-section, .result-section {
+            background-color: var(--cor-secundaria);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            margin-bottom: 24px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .input-section:hover, .result-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--cor-texto);
+        }
+
+        .form-control, .form-select {
+            background-color: var(--cor-input-fundo);
+            border: 2px solid #555555;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 14px;
+            color: var(--cor-input-texto);
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--cor-primaria);
+            box-shadow: none;
+        }
+
+        .btn-primary {
+            background-color: var(--cor-primaria);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #E65A2E; /* Laranja mais escuro */
+        }
+
+        .destaque-preco {
+            font-size: 28px;
+            color: var(--cor-primaria);
+            font-weight: 600;
+            animation: fadeIn 1s ease;
+        }
+
+        .highlight {
+            color: var(--cor-primaria);
+            font-weight: 600;
+        }
+
+        .badge-taxas {
+            background-color: var(--cor-primaria);
+            color: var(--cor-secundaria);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .alerta {
+            color: #D32F2F;
+            font-weight: 500;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .animacao-entrada {
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .collapse-section {
+            margin-top: 16px;
+        }
+
+        .collapse-header {
+            cursor: pointer;
+            color: var(--cor-primaria);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .collapse-header:hover {
+            text-decoration: underline;
+        }
+
+        .tema-claro {
+            --cor-secundaria: #FFFFFF; /* Branco */
+            --cor-texto: #1A1A1A; /* Preto */
+            --cor-fundo: #F9F9F9; /* Cinza claro */
+            --cor-input-fundo: #FFFFFF; /* Fundo branco para inputs no tema claro */
+            --cor-input-texto: #1A1A1A; /* Texto preto para inputs no tema claro */
+        }
+
+        .btn-tema {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--cor-primaria);
+            color: var(--cor-secundaria);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body class="container py-5">
+    <!-- Botão de alternar tema -->
+    <button class="btn-tema" onclick="alternarTema()">🌙 Tema Escuro</button>
+
+    <header class="text-center mb-5">
+        <h1 class="display-4" style="color: var(--cor-primaria);">A Sertaneja</h1>
+        <p class="lead" style="color: var(--cor-texto);">Calculadora de Preços para Dropshipping e Envio Próprio</p>
+    </header>
+
+    <!-- Seção de Inputs -->
+    <div class="input-section animacao-entrada">
+        <h3 class="mb-4">🔧 Dados de Entrada</h3>
+        <div class="row g-3">
+            <!-- Seleção do Tipo de Envio -->
+            <div class="col-md-12">
+                <label class="form-label">Tipo de Envio</label>
+                <select id="tipoEnvio" class="form-select">
+                    <option value="dropshippingInternacional">Dropshipping Internacional (AliExpress)</option>
+                    <option value="dropshippingNacional">Dropshipping Nacional (Sem Impostos de Importação)</option>
+                    <option value="envioProprio">Envio Próprio (Com Frenet)</option>
+                </select>
+            </div>
+
+            <!-- Inputs principais -->
+            <div class="col-md-4">
+                <label class="form-label">Custo do Produto (R$)</label>
+                <input type="number" id="custoProduto" class="form-control" step="0.01">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Frete (R$)</label>
+                <input type="number" id="frete" class="form-control" step="0.01">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Margem Lucro Líquida (%)</label>
+                <input type="number" id="margemLiquida" class="form-control" value="25" step="0.1">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Margem Lucro Bruta (%)</label>
+                <input type="number" id="margemBruta" class="form-control" readonly>
+            </div>
+
+            <!-- Seção expansível para outros inputs -->
+            <div class="col-md-12 collapse-section">
+                <div class="collapse-header" data-bs-toggle="collapse" data-bs-target="#outrosInputs">
+                    <span>🔽 Outros Parâmetros</span>
+                </div>
+                <div id="outrosInputs" class="collapse">
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-4">
+                            <label class="form-label">Custo de Publicidade (R$)</label>
+                            <input type="number" id="cac" class="form-control" step="0.01">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Taxa do Simples Nacional (%)</label>
+                            <input type="number" id="simplesNacional" class="form-control" value="6" step="0.1">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">ICMS (%)</label>
+                            <input type="number" id="icms" class="form-control" value="18" step="0.1">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Plano Yampi</label>
+                            <select id="yampi" class="form-select">
+                                <option value="2.5" selected>Basic (2.5%)</option>
+                                <option value="2">Starter (2%)</option>
+                                <option value="1.5">Pro (1.5%)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Taxa Mercado Pago (%)</label>
+                            <input type="number" id="mercadoPago" class="form-control" value="4.99" step="0.1">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Custos Fixos Mensais (R$)</label>
+                            <input type="number" id="custosFixos" class="form-control" step="0.01">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Previsão de Vendas</label>
+                            <input type="number" id="vendasMensais" class="form-control" value="100">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção de Resultados -->
+    <div class="result-section animacao-entrada">
+        <h3 class="mb-4">📊 Resultados Calculados</h3>
+
+        <!-- Custos Diretos (Total inicialmente visível) -->
+        <div class="alert alert-secondary mb-4">
+            <div class="collapse-header" data-bs-toggle="collapse" data-bs-target="#detalhesCustosDiretos">
+                <span>📦 Custos Diretos: <span id="totalCustosDiretos" class="highlight">R$ 0.00</span></span>
+            </div>
+            <div id="detalhesCustosDiretos" class="collapse mt-2">
+                <p>Produto + Frete: <span id="custoBase" class="highlight">R$ 0.00</span></p>
+                <p>Imposto de Importação: <span id="valorII" class="highlight">R$ 0.00</span></p>
+                <p>ICMS: <span id="valorICMS" class="highlight">R$ 0.00</span></p>
+                <p>Custo Fixo por Unidade: <span id="custoFixo" class="highlight">R$ 0.00</span></p>
+            </div>
+        </div>
+
+        <!-- Total de Taxas (Total inicialmente visível) -->
+        <div class="alert alert-warning mb-4">
+            <div class="collapse-header" data-bs-toggle="collapse" data-bs-target="#detalhesTaxas">
+                <span>📉 Total de Taxas: <span id="totalTaxas" class="badge-taxas">R$ 0.00</span></span>
+            </div>
+            <div id="detalhesTaxas" class="collapse mt-2">
+                <p>Simples Nacional: <span id="valorSimples" class="badge-taxas">R$ 0.00</span></p>
+                <p>Yampi: <span id="valorYampi" class="badge-taxas">R$ 0.00</span></p>
+                <p>Mercado Pago: <span id="valorMercadoPago" class="badge-taxas">R$ 0.00</span></p>
+                <p>Frenet: <span id="valorFrenet" class="badge-taxas">R$ 0.00</span></p>
+                <p>CAC (Publicidade): <span id="valorCAC" class="badge-taxas">R$ 0.00</span></p>
+            </div>
+        </div>
+
+        <!-- Preço de Venda Ideal e Lucro/Margens -->
+        <div class="alert alert-success mb-4">
+            <h4 class="alert-heading">💰 Preço de Venda Ideal:</h4>
+            <span id="precoVenda" class="destaque-preco">R$ 0.00</span>
+            <hr>
+            <p><strong>Lucro por Venda:</strong> <span id="lucro" class="highlight">R$ 0.00</span></p>
+            <p><strong>Margem Bruta:</strong> <span id="margemBrutaResultado">0%</span></p>
+            <p><strong>Margem Líquida:</strong> <span id="margemLiquidaResultado">0%</span></p>
+            <small>
+                - <strong>Margem Bruta:</strong> Lucro em relação ao preço de venda, sem considerar taxas.<br>
+                - <strong>Margem Líquida:</strong> Lucro em relação ao preço de venda, após todas as taxas.
+            </small>
+        </div>
+
+        <!-- Alerta de Margem -->
+        <div id="alertaMargem" class="mt-3 alerta"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Função para alternar entre tema escuro e claro
+        function alternarTema() {
+            const body = document.body;
+            const btnTema = document.querySelector('.btn-tema');
+            if (body.classList.contains('tema-claro')) {
+                body.classList.remove('tema-claro');
+                btnTema.textContent = '🌙 Tema Escuro';
+            } else {
+                body.classList.add('tema-claro');
+                btnTema.textContent = '☀️ Tema Claro';
+            }
+        }
+
+        // Função de cálculo
+        function calcular() {
+            // Inputs
+            const tipoEnvio = document.getElementById('tipoEnvio').value;
+            const custoProduto = parseFloat(document.getElementById('custoProduto').value) || 0;
+            const frete = parseFloat(document.getElementById('frete').value) || 0;
+            const cac = parseFloat(document.getElementById('cac').value) || 0;
+            const simplesNacional = parseFloat(document.getElementById('simplesNacional').value) / 100 || 0;
+            const icms = tipoEnvio === "dropshippingInternacional" ? parseFloat(document.getElementById('icms').value) / 100 : 0;
+            const yampi = parseFloat(document.getElementById('yampi').value) / 100 || 0;
+            const mercadoPago = parseFloat(document.getElementById('mercadoPago').value) / 100 || 0;
+            const custosFixos = parseFloat(document.getElementById('custosFixos').value) || 0;
+            const vendasMensais = parseFloat(document.getElementById('vendasMensais').value) || 1;
+            const margemLiquida = parseFloat(document.getElementById('margemLiquida').value) / 100 || 0.25; // Padrão 25%
+            const taxaTotal = simplesNacional + yampi + mercadoPago;
+
+            // Cálculo da Margem Bruta
+            const margemBruta = margemLiquida + taxaTotal;
+            document.getElementById('margemBruta').value = (margemBruta * 100).toFixed(1);
+
+            // Cálculos Base
+            const custoBase = custoProduto + frete;
+
+            // Imposto de Importação (apenas para Dropshipping Internacional)
+            let impostoImportacaoValor = 0;
+            if (tipoEnvio === "dropshippingInternacional") {
+                const valorTotal = custoProduto + frete;
+                const limiteIsencao = 250; // R$250 (equivalente a ~US$50)
+                const aliquotaII = valorTotal <= limiteIsencao ? 0.20 : 0.60; // 20% ou 60%
+                impostoImportacaoValor = valorTotal * aliquotaII;
+            }
+
+            // ICMS (padrão para Dropshipping Internacional)
+            let icmsValor = 0;
+            if (tipoEnvio === "dropshippingInternacional") {
+                const baseICMS = (custoBase + impostoImportacaoValor) / (1 - icms);
+                icmsValor = baseICMS * icms;
+            }
+
+            // Frenet (apenas para Envio Próprio)
+            const frenet = tipoEnvio === "envioProprio" ? 0.02 : 0;
+            const valorFrenet = (custoBase + impostoImportacaoValor + icmsValor) * frenet;
+
+            // Custo Fixo por Unidade
+            const custoFixoPorUnidade = custosFixos / vendasMensais;
+
+            // Custo Total por Venda
+            const custoTotal = custoBase + impostoImportacaoValor + icmsValor + custoFixoPorUnidade + cac + valorFrenet;
+
+            // Cálculo do Preço de Venda (Fórmula Contábil Correta)
+            const precoVenda = custoTotal / (1 - margemBruta);
+
+            // Lucro Real
+            const lucro = precoVenda * margemBruta;
+
+            // Margens
+            const margemLiquidaCalculada = ((precoVenda - custoTotal - (precoVenda * taxaTotal)) / precoVenda) * 100;
+
+            // Atualização da Interface
+            document.getElementById('custoBase').textContent = `R$ ${custoBase.toFixed(2)}`;
+            document.getElementById('valorII').textContent = `R$ ${impostoImportacaoValor.toFixed(2)}`;
+            document.getElementById('valorICMS').textContent = `R$ ${icmsValor.toFixed(2)}`;
+            document.getElementById('custoFixo').textContent = `R$ ${custoFixoPorUnidade.toFixed(2)}`;
+            document.getElementById('valorSimples').textContent = `R$ ${(precoVenda * simplesNacional).toFixed(2)}`;
+            document.getElementById('valorYampi').textContent = `R$ ${(precoVenda * yampi).toFixed(2)}`;
+            document.getElementById('valorMercadoPago').textContent = `R$ ${(precoVenda * mercadoPago).toFixed(2)}`;
+            document.getElementById('valorFrenet').textContent = `R$ ${valorFrenet.toFixed(2)}`;
+            document.getElementById('valorCAC').textContent = `R$ ${cac.toFixed(2)}`;
+            document.getElementById('precoVenda').textContent = `R$ ${precoVenda.toFixed(2)}`;
+            document.getElementById('lucro').textContent = `R$ ${lucro.toFixed(2)}`;
+            document.getElementById('margemBrutaResultado').textContent = `${(margemBruta * 100).toFixed(1)}%`;
+            document.getElementById('margemLiquidaResultado').textContent = `${margemLiquidaCalculada.toFixed(1)}%`;
+            document.getElementById('totalCustosDiretos').textContent = `R$ ${totalCustosDiretos.toFixed(2)}`;
+            document.getElementById('totalTaxas').textContent = `R$ ${totalTaxas.toFixed(2)}`;
+
+            // Alertas
+            const alerta = document.getElementById('alertaMargem');
+            alerta.innerHTML = "";
+            if (margemLiquidaCalculada < 0.2) {
+                alerta.innerHTML = "⚠️ Margem líquida abaixo de 20%!";
+            }
+            if ((taxaTotal + margemBruta) >= 0.9) {
+                alerta.innerHTML += "<br>❌ Taxas totais excedem 90%!";
+            }
+        }
+
+        // Atualização automática
+        document.querySelectorAll('input, select').forEach(element => {
+            element.addEventListener('input', calcular);
+        });
+        window.addEventListener('load', calcular);
+
+        // Habilitar/Desabilitar ICMS
+        document.getElementById('tipoEnvio').addEventListener('change', function() {
+            const icmsInput = document.getElementById('icms');
+            if (this.value === "dropshippingInternacional") {
+                icmsInput.disabled = false;
+            } else {
+                icmsInput.disabled = true;
+            }
+            calcular();
+        });
+    </script>
+</body>
+</html>
