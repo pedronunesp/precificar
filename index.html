@@ -140,10 +140,12 @@
             --cor-input-texto: #1A1A1A; /* Texto preto para inputs no tema claro */
         }
 
+        .seletor-tema {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
         .btn-tema {
-            position: fixed;
-            top: 20px;
-            right: 20px;
             background-color: var(--cor-primaria);
             color: var(--cor-secundaria);
             border: none;
@@ -152,13 +154,19 @@
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
-            z-index: 1000;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-tema:hover {
+            background-color: #E65A2E; /* Laranja mais escuro */
         }
     </style>
 </head>
 <body class="container py-5">
-    <!-- Botão de alternar tema -->
-    <button class="btn-tema" onclick="alternarTema()">🌙 Tema Escuro</button>
+    <!-- Seletor de Tema -->
+    <div class="seletor-tema">
+        <button class="btn-tema" onclick="alternarTema()">🌙 Tema Escuro</button>
+    </div>
 
     <header class="text-center mb-5">
         <h1 class="display-4" style="color: var(--cor-primaria);">A Sertaneja</h1>
@@ -346,68 +354,4 @@
             }
 
             // Frenet (apenas para Envio Próprio)
-            const frenet = tipoEnvio === "envioProprio" ? 0.02 : 0;
-            const valorFrenet = (custoBase + impostoImportacaoValor + icmsValor) * frenet;
-
-            // Custo Fixo por Unidade
-            const custoFixoPorUnidade = custosFixos / vendasMensais;
-
-            // Custo Total por Venda
-            const custoTotal = custoBase + impostoImportacaoValor + icmsValor + custoFixoPorUnidade + cac + valorFrenet;
-
-            // Cálculo do Preço de Venda (Fórmula Contábil Correta)
-            const precoVenda = custoTotal / (1 - margemBruta);
-
-            // Lucro Real
-            const lucro = precoVenda * margemBruta;
-
-            // Margens
-            const margemLiquidaCalculada = ((precoVenda - custoTotal - (precoVenda * taxaTotal)) / precoVenda) * 100;
-
-            // Atualização da Interface
-            document.getElementById('custoBase').textContent = `R$ ${custoBase.toFixed(2)}`;
-            document.getElementById('valorII').textContent = `R$ ${impostoImportacaoValor.toFixed(2)}`;
-            document.getElementById('valorICMS').textContent = `R$ ${icmsValor.toFixed(2)}`;
-            document.getElementById('custoFixo').textContent = `R$ ${custoFixoPorUnidade.toFixed(2)}`;
-            document.getElementById('valorSimples').textContent = `R$ ${(precoVenda * simplesNacional).toFixed(2)}`;
-            document.getElementById('valorYampi').textContent = `R$ ${(precoVenda * yampi).toFixed(2)}`;
-            document.getElementById('valorMercadoPago').textContent = `R$ ${(precoVenda * mercadoPago).toFixed(2)}`;
-            document.getElementById('valorFrenet').textContent = `R$ ${valorFrenet.toFixed(2)}`;
-            document.getElementById('valorCAC').textContent = `R$ ${cac.toFixed(2)}`;
-            document.getElementById('precoVenda').textContent = `R$ ${precoVenda.toFixed(2)}`;
-            document.getElementById('lucro').textContent = `R$ ${lucro.toFixed(2)}`;
-            document.getElementById('margemBrutaResultado').textContent = `${(margemBruta * 100).toFixed(1)}%`;
-            document.getElementById('margemLiquidaResultado').textContent = `${margemLiquidaCalculada.toFixed(1)}%`;
-            document.getElementById('totalCustosDiretos').textContent = `R$ ${totalCustosDiretos.toFixed(2)}`;
-            document.getElementById('totalTaxas').textContent = `R$ ${totalTaxas.toFixed(2)}`;
-
-            // Alertas
-            const alerta = document.getElementById('alertaMargem');
-            alerta.innerHTML = "";
-            if (margemLiquidaCalculada < 0.2) {
-                alerta.innerHTML = "⚠️ Margem líquida abaixo de 20%!";
-            }
-            if ((taxaTotal + margemBruta) >= 0.9) {
-                alerta.innerHTML += "<br>❌ Taxas totais excedem 90%!";
-            }
-        }
-
-        // Atualização automática
-        document.querySelectorAll('input, select').forEach(element => {
-            element.addEventListener('input', calcular);
-        });
-        window.addEventListener('load', calcular);
-
-        // Habilitar/Desabilitar ICMS
-        document.getElementById('tipoEnvio').addEventListener('change', function() {
-            const icmsInput = document.getElementById('icms');
-            if (this.value === "dropshippingInternacional") {
-                icmsInput.disabled = false;
-            } else {
-                icmsInput.disabled = true;
-            }
-            calcular();
-        });
-    </script>
-</body>
-</html>
+            const frenet =
